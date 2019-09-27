@@ -1,0 +1,97 @@
+Grocer
+  #consolidate_cart
+    adds a count of one to each item when there are no duplicates
+    increments count when there are multiple items
+  #apply_coupons
+    base case - with perfect coupon (number of items identical):
+      adds a new key, value pair to the cart hash called 'ITEM NAME W/COUPON'
+      adds the coupon price to the property hash of couponed item
+      adds the count number to the property hash of couponed item
+      removes the number of discounted items from the original item's count
+      remembers if the item was on clearance (FAILED - 1)
+    more advanced cases:
+      accounts for when there are more items than the coupon allows (FAILED - 2)
+      doesn't break if the coupon doesn't apply to any items
+      can apply multiple coupons (FAILED - 3)
+      doesn't break if there is no coupon
+      can increment coupon count if two are applied
+  #apply_clearance
+    takes 20% off price if the item is on clearance
+    does not discount the price for items not on clearance
+  #checkout
+    base case (no clearance, no coupons)
+      calls on #consolidate_cart before calculating the total for one item
+      calls on #apply_coupons after calling on #consolidate_cart when there is only one item in the cart
+      calls on #apply_clearance after calling on #apply_coupons when there is only one item in the cart and no coupon
+      calls on #apply_clearance after calling on #apply_coupons with multiple items and one coupon
+      calls on #apply_clearance after calling on #apply_coupons with multiple items, coupons, and items are on clearance (FAILED - 4)
+      calls on #consolidate_cart before calculating the total for two differentitems
+      calls on #consolidate_cart before calculating the total for two identicalitems
+    coupons:
+      considers coupons
+      considers coupons and clearance discounts (FAILED - 5)
+      charges full price for items that fall outside of coupon count
+      only applies coupons that meet minimum amount
+    clearance:
+      applies a 20% discount to items on clearance
+      applies a 20% discount to items on clearance but not to non-clearance items
+    discount of ten percent
+      applies 10% discount if cart over $100
+
+Failures:
+
+  1) Grocer #apply_coupons base case - with perfect coupon (number of items identical): remembers if the item was on clearance
+     Failure/Error: expect(@avocado_result["AVOCADO W/COUPON"][:clearance]).to eq(true)
+
+       expected: true
+            got: nil
+
+       (compared using ==)
+     # ./spec/grocer_spec.rb:78:in `block (4 levels) in <top (required)>'
+
+  2) Grocer #apply_coupons more advanced cases: accounts for when there are more items than the coupon allows
+     Failure/Error: expect(cheese_result["CHEESE W/COUPON"][:clearance]).to eq(false)
+
+       expected: false
+            got: nil
+
+       (compared using ==)
+     # ./spec/grocer_spec.rb:96:in `block (4 levels) in <top (required)>'
+
+  3) Grocer #apply_coupons more advanced cases: can apply multiple coupons
+     Failure/Error: expect(multiple_coupons["CHEESE W/COUPON"][:clearance]).to eq(false)
+
+       expected: false
+            got: nil
+
+       (compared using ==)
+     # ./spec/grocer_spec.rb:126:in `block (4 levels) in <top (required)>'
+
+  4) Grocer #checkout base case (no clearance, no coupons) calls on #apply_clearance after calling on #apply_coupons with multiple items, coupons, and items are on clearance
+     Failure/Error: expect(checkout(cart, coupons)).to eq(22.60)
+
+       expected: 22.6
+            got: 23.6
+
+       (compared using ==)
+     # ./spec/grocer_spec.rb:245:in `block (4 levels) in <top (required)>'
+
+  5) Grocer #checkout coupons: considers coupons and clearance discounts
+     Failure/Error: expect(checkout(cart, coupons)).to eq(4.00)
+
+       expected: 4.0
+            got: 5.0
+
+       (compared using ==)
+     # ./spec/grocer_spec.rb:277:in `block (4 levels) in <top (required)>'
+
+Finished in 0.04689 seconds (files took 0.12974 seconds to load)
+28 examples, 5 failures
+
+Failed examples:
+
+rspec ./spec/grocer_spec.rb:77 # Grocer #apply_coupons base case - with perfectcoupon (number of items identical): remembers if the item was on clearance
+rspec ./spec/grocer_spec.rb:85 # Grocer #apply_coupons more advanced cases: accounts for when there are more items than the coupon allows
+rspec ./spec/grocer_spec.rb:111 # Grocer #apply_coupons more advanced cases: can apply multiple coupons
+rspec ./spec/grocer_spec.rb:230 # Grocer #checkout base case (no clearance, no coupons) calls on #apply_clearance after calling on #apply_coupons with multipleitems, coupons, and items are on clearance
+rspec ./spec/grocer_spec.rb:273 # Grocer #checkout coupons: considers coupons and clearance discounts
